@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -19,6 +20,14 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Invalid Method")
+	}
+	var fileHeader *multipart.FileHeader
+	var e error
+	_, fileHeader, e = r.FormFile("image")
+	if e != nil {
+		fmt.Fprintln(w, "not found")
 		return
 	}
+	fmt.Fprintln(w, fileHeader.Filename)
+	return
 }
