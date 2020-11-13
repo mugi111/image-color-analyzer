@@ -31,6 +31,15 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fileHeader := make([]byte, 512)
+
+	if _, err := file.Read(fileHeader);err != nil{
+		fmt.Fprintf(w, "err read")
+		return
+	}
+
+	file.Seek(0, 0)
+
 	defer file.Close()
 
 	out, err := os.Create(header.Filename)
@@ -48,4 +57,5 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "File uploaded successfully: ")
 	fmt.Fprintf(w, header.Filename)
+	fmt.Fprintf(w, "MIME: %#v\n", http.DetectContentType(fileHeader))
 }
