@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"mime/multipart"
+	"io"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -28,6 +30,39 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "not found")
 		return
 	}
-	fmt.Fprintln(w, fileHeader.Filename)
-	return
+
+	file, header, err := r.FormFile("file")
+
+	if err != nil {
+		fmt.Fprintln(w, err)
+		return
+	}
+
+	fileHeader := make([]byte, 512)
+
+	if _, err := file.Read(fileHeader);err != nil{
+		fmt.Fprintf(w, "err read")
+		return
+	}
+
+	file.Seek(0, 0)
+
+	defer file.Close()
+
+	out, err := os.Create(header.Filename)
+	if err != nil {
+		fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
+		return
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		fmt.Fprintln(w, err)
+	}
+
+	fmt.Fprintf(w, "File uploaded successfully: ")
+	fmt.Fprintf(w, header.Filename)
+	fmt.Fprintf(w, "MIME: %#v\n", http.DetectContentType(fileHeader))
 }
