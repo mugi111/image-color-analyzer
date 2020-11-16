@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"mime/multipart"
 	"io"
 	"net/http"
 	"os"
@@ -23,13 +22,6 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Invalid Method")
 	}
-	var fileHeader *multipart.FileHeader
-	var e error
-	_, fileHeader, e = r.FormFile("image")
-	if e != nil {
-		fmt.Fprintln(w, "not found")
-		return
-	}
 
 	file, header, err := r.FormFile("file")
 
@@ -40,7 +32,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 	fileHeader := make([]byte, 512)
 
-	if _, err := file.Read(fileHeader);err != nil{
+	if _, err := file.Read(fileHeader); err != nil {
 		fmt.Fprintf(w, "err read")
 		return
 	}
