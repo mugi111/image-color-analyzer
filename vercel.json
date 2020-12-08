@@ -3,6 +3,6 @@
   "version": 2,
   "name": "image-color-analyzer",
   "builds": [
-    { "src": "*.go", "use": "@vercel/go" }
+    { "src": "index.go", "use": "@vercel/go" }
   ]
 }
