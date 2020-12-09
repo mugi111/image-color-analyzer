@@ -3,8 +3,6 @@ package upload
 import (
 	"net/http"
 	"fmt"
-	"os"
-	"io"
 )
 
 // Handler upload handler
@@ -32,15 +30,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	defer file.Close()
 
-	out, err := os.Create(header.Filename)
-	if err != nil {
-		fmt.Fprintf(w, "Unable to create the file for writing. Check your write access privilege")
-		return
-	}
-
-	defer out.Close()
-
-	_, err = io.Copy(out, file)
 	if err != nil {
 		fmt.Fprintln(w, err)
 	}
