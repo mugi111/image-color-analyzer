@@ -1,9 +1,27 @@
 package upload
 
 import (
+	"image"
 	"net/http"
 	"fmt"
+	"io"
 )
+
+func getPixels(file io.Reader) (x, y int, err error) {
+  img, _, err := image.Decode(file)
+
+  if err != nil {
+    return 0, 0, err
+  }
+
+  bounds := img.Bounds()
+	return bounds.Max.X, bounds.Max.Y, nil
+}
+
+func getPixelColor(img image.Image, x, y int) (uint32, uint32, uint32) {
+	r, g, b, _ := img.At(x, y).RGBA()
+	return r, g, b
+}
 
 // Handler upload handler
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +33,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("file")
 
 	if err != nil {
-		fmt.Fprintln(w, err)
+		fmt.Fprintln(w, "error:", err)
 		return
 	}
 
@@ -28,11 +46,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	file.Seek(-1, 0)
 
-	defer file.Close()
-
+	width, height, err := getPixels(file)
 	if err != nil {
-		fmt.Fprintln(w, err)
+		fmt.Fprintln(w, "error:", err)
+	} else {
+		fmt.Fprintln(w, width, height)
 	}
+
+	defer file.Close()
 
 	fmt.Fprintf(w, "File uploaded successfully: ")
 	fmt.Fprintf(w, header.Filename)
