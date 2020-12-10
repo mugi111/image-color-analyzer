@@ -2,6 +2,9 @@ package upload
 
 import (
 	"image"
+	_ "image/png"
+	_ "image/jpeg"
+	_ "image/gif"
 	"net/http"
 	"fmt"
 	"io"
@@ -44,7 +47,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file.Seek(-1, 0)
+	file.Seek(0, 0)
 
 	width, height, err := getPixels(file)
 	if err != nil {
